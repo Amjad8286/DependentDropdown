@@ -1,0 +1,88 @@
+{% block body %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+
+<div class="container" style = "margin-top:50px">
+    <form method="post" id="indexForm" data-state-url="{% url 'ajax_load_state' %}" data-city-url="{% url 'ajax_load_city' %}">
+         {% csrf_token %}
+        <label>Country</label>
+        <select name="country" id="country" class="form-control select-drop">
+            <option value="">Select Country</option>
+            {% for i in country %}
+            <option value="{{i.id}}">{{i.name}}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <label>State</label>
+           <select name="states" id="states" class="form-control select-drop">
+
+        </select>
+        <br><br>
+        <label>Citys</label>
+           <select name="city" id="city" class="form-control select-drop">
+        </select>
+        <br>
+    </form>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+  <script>
+
+    $("#country").change(function () {
+      var url = $("#indexForm").attr("data-state-url");
+      var countryID = $(this).val(); 
+
+      $.ajax({                    
+        url: url,  
+        data: {
+          'country': countryID
+        },
+        success: function (data) {
+          $(".select-drop").select2({
+            allowClear: true
+          });   
+          $("#states").html(data);
+        
+          
+          
+        }
+      });
+
+    });
+
+
+    $("#states").change(function () {
+      var url = $("#indexForm").attr("data-city-url");
+      var stateID = $(this).val(); 
+
+      $.ajax({                    
+        url: url,  
+        data: {
+          'state': stateID
+        },
+        success: function (data) {
+          $(".select-drop").select2({
+            allowClear: true
+          });   
+          $("#city").html(data);
+        
+          
+          
+        }
+      });
+
+    });
+
+  </script>
+  <script>
+
+$(document).ready(function () {
+     $(".select-drop").select2({          
+          allowClear: true
+      });
+    });   
+  </script>
+
+{% endblock%}
