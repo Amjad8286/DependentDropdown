@@ -21,11 +21,8 @@ def load_city(request):
     return render(request,'city.html',{'city': city})
 
 class dropdownLazyState(View):
-    def get(self, request, *args, **kwargs):
-        # state = list(State.objects.values())
-        state_id = request.GET.get('country')
-        s = State.objects.values()
-        state = list(s)
+    def get(self, *args, **kwargs):
+        state = list(State.objects.values())
         return JsonResponse({'data':state})
 
 class dropdownLazyCity(View):
