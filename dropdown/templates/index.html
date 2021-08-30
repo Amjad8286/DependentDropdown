@@ -1,88 +1,138 @@
-{% block body %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-
-<div class="container" style = "margin-top:50px">
-    <form method="post" id="indexForm" data-state-url="{% url 'ajax_load_state' %}" data-city-url="{% url 'ajax_load_city' %}">
-         {% csrf_token %}
-        <label>Country</label>
+<style>
+  li:hover {
+    background-color: darkgray;
+  }
+  
+</style>
+<div class="container" style="margin-top:50px">
+  <form method="post" id="indexForm" data-state-url="{% url 'ajax_load_state' %}"
+    data-city-url="{% url 'ajax_load_city' %}">
+    <div class="row">
+      {% csrf_token %}
+      <div class="col-4">
+        <label>Country:</label>
         <select name="country" id="country" class="form-control select-drop">
-            <option value="">Select Country</option>
-            {% for i in country %}
-            <option value="{{i.id}}">{{i.name}}</option>
-            {% endfor %}
+          <option value="">Select Country</option>
+          {% for i in country %}
+          <option value="{{i.id}}">{{i.name}}</option>
+          {% endfor %}
         </select>
-        <br><br>
-        <label>State</label>
-           <select name="states" id="states" class="form-control select-drop">
-
+      </div>
+      <div class="col-4">
+        <!-- <div id="lazy-state"></div> -->
+        <label>State:</label>
+        <select name="states" id="states" class="form-control select-drop">
+          <!-- <li id="lazy-state"></li> -->
+          <option>Select States</option>
         </select>
-        <br><br>
-        <label>Citys</label>
-           <select name="city" id="city" class="form-control select-drop">
+      </div>
+      <div onscroll="myFunction()"class="col-4">
+        <!-- <div id="lazy-city"></div> -->
+        <label>Citys:</label>
+        <select name="city" id="city" class="form-control select-drop">
+          <option>Select City</option>
         </select>
-        <br>
-    </form>
+      </div>
+    </div>
+  </form>
 </div>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-  <script>
 
-    $("#country").change(function () {
-      var url = $("#indexForm").attr("data-state-url");
-      var countryID = $(this).val(); 
+<script>
+  $("#country").change(function () {
+    var url = $("#indexForm").attr("data-state-url");
+    var countryID = $(this).val();
 
-      $.ajax({                    
-        url: url,  
-        data: {
-          'country': countryID
-        },
-        success: function (data) {
-          $(".select-drop").select2({
-            allowClear: true
-          });   
-          $("#states").html(data);
-        
-          
-          
-        }
-      });
-
-    });
-
-
-    $("#states").change(function () {
-      var url = $("#indexForm").attr("data-city-url");
-      var stateID = $(this).val(); 
-
-      $.ajax({                    
-        url: url,  
-        data: {
-          'state': stateID
-        },
-        success: function (data) {
-          $(".select-drop").select2({
-            allowClear: true
-          });   
-          $("#city").html(data);
-        
-          
-          
-        }
-      });
-
-    });
-
-  </script>
-  <script>
-
-$(document).ready(function () {
-     $(".select-drop").select2({          
+    $.ajax({
+      url: url,
+      data: {
+        'country': countryID
+      },
+      success: function (data) {
+        // console.log(data);
+        $(".select-drop").select2({
           allowClear: true
-      });
-    });   
-  </script>
+        });
+        $("#states").html(data);
 
-{% endblock%}
+      }
+    });
+  });
+</script>
+
+<script>
+  $("#states").change(function () {
+    var url = $("#indexForm").attr("data-city-url");
+    var stateID = $(this).val();
+
+    $.ajax({
+      url: url,
+      data: {
+        'state': stateID
+      },
+      success: function (data) {
+        $(".select-drop").select2({
+          allowClear: true
+        });
+        $("#city").html(data);
+      }
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function () {
+    $(".select-drop").select2({
+      allowClear: true
+    });
+  });
+</script>
+<script>
+  const lazyState = document.getElementById("states")
+  $.ajax({
+    type: 'GET',
+    url: 'lazy-state/',
+    success: function (response) {
+      const data = response.data
+      data.forEach(s => {
+        lazyState.innerHTML += `<option value="${s.id}">${s.state}</option>`
+      });
+
+    }
+  });
+
+  const lazyCity = document.getElementById("city")
+  console.log(lazyCity)
+  let visible = 5
+  const lazyLoading = () => {
+    $.ajax({
+      type: 'GET',
+      url: `lazy-city/${visible}`,
+      success: function (response) {
+        const data = response.data
+        data.forEach(s => {
+          lazyCity.innerHTML += `<option value="${s.id}">${s.city}</option>`
+        });
+      }
+    });
+  }
+
+  lazyLoading()
+
+  myFunction = () => {
+    visible += 5
+    console.log('Clicked')
+    lazyLoading()
+  }
+// setInterval(() => {
+//   visible += 5
+//     lazyLoading()
+// }, 
+// 5000);
+
+</script>
