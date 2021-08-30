@@ -28,7 +28,7 @@ class dropdownLazyState(View):
 class dropdownLazyCity(View):
     def get(self, *args, **kwargs):
         upper = kwargs.get('cid')
-        lower = upper - 5
+        lower = upper - 20
         city = list(City.objects.values()[lower:upper])
         return JsonResponse({'data':city})
        
